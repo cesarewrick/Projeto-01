@@ -5,6 +5,48 @@ class EstudanteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudante
         fields = ['id', 'nome', 'email', 'cpf', 'data_nascimento', 'celular']
+        
+        def validate_cpf(self,cpf):
+            if len(cpf) != 11:
+                raise serializers.ValidationError('O CPF deve ter 11 dígitos.')
+            
+            if not cpf.isdigit():
+                raise serializers.ValidationError('O CPF deve conter apenas números.')
+            
+            return cpf
+        
+        def validate_nome(self, nome):
+            if not re.match(r'^[A-Za-zÀ-ú\s]+$', nome):
+                raise serializers.ValidationError("O nome deve conter apenas letras e espaços.")
+            
+            if len(nome.strip()) < 3:
+                raise serializers.ValidationError('O nome deve ter pelo menis 3 caracteres.')
+            
+            return nome
+        
+        def validate_email(self, email):
+             if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+                 raise serializers.ValidationError('O e-mail informado não é valido.')
+             
+             return email
+        def validate_data_nascimento(self, data_nascimento):
+            if data_nascimento > date.today():
+                raise serializers.ValidatonError('A data de nascimeento não pode ser no futuro.')
+            
+            idade = (date.today() - data_nascimento).days // 365
+            if idade < 18:
+                raise serializers.ValidationError('0 estudante deve ter pelo menis 18 anos')
+            
+            return data_nascimento
+        
+        def validate_celular(self, celular):
+            if len(celular) != 11:
+                raise serializers.ValidationErros('O celular deve ter 11 digitos.')
+            
+            if not celular.isdigit():
+                raise serializers.ValidationError('O celular deve conter apenas números.')
+            
+            return celular
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
